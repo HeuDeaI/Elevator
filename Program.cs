@@ -1,15 +1,19 @@
 ﻿using System;
 using System.Threading;
-using System.Collections.Generic;
-
 
 class Program
 {
     static void Main(string[] args)
     {
-        Elevator elevator = new Elevator();
-        Building building = new Building(10);
-        building.AllPersonCallElevator(elevator);
-        elevator.BringPeople();
+        ElevatorSystem elevatorSystem = new ElevatorSystem(10, 5);
+
+        Thread elevatorThread = new Thread(elevatorSystem.OperateElevator);
+        elevatorThread.Start();
+
+        elevatorSystem.SimulateWithDelays(10);
+
+        Thread.Sleep(5000);
+        Environment.Exit(0);
     }
 }
+

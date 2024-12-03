@@ -1,111 +1,70 @@
-class Elevator{
-    public int CurrentFloor = 1;
-    private int _timeToChangeFloor = 500; 
-    public int MoveDirection = 1;
-    private List<Person> _waitingToDownPersons = new List<Person>();
-    private List<Person> _waitingToUpPersons = new List<Person>();
-    private List<Person> _personsIntoElevator = new List<Person>();
-    private int MaxCapacity = 5;
+using System;
+using System.Collections.Concurrent;
+using System.Collections.Generic;
+using System.Linq;
+using System.Threading;
 
-    public void MoveToFloor(Person person)
+class Elevator
+{
+    private int _currentFloor = 1;
+    private readonly int _maxCapacity;
+    private readonly int _totalFloors;
+    private readonly ConcurrentQueue<Person> _requestQueue = new ConcurrentQueue<Person>();
+    private readonly List<Person> _insideElevator = new List<Person>();
+
+    private const int TimeBetweenFloors = 100;
+
+    public Elevator(int totalFloors, int maxCapacity)
     {
-        if (person.CurrentFloor < CurrentFloor)
+        _totalFloors = totalFloors;
+        _maxCapacity = maxCapacity;
+    }
+
+    public void AddRequest(Person person)
+    {
+        _requestQueue.Enqueue(person);
+        Console.WriteLine($"Person #{person.Id} requests from floor {person.CurrentFloor} to floor {person.DestinationFloor}");
+    }
+
+public void Operate()
+{
+    while (true)
+    {
+        if (_requestQueue.IsEmpty && !_insideElevator.Any())
         {
-            MoveDirection = -1;
+            Thread.Sleep(100); 
+            continue;
         }
-        else
+
+        while (_requestQueue.TryDequeue(out var person) && person != null)
         {
-            MoveDirection = 1;
+            MoveToFloor(person.CurrentFloor);
+            Console.WriteLine($"Person #{person.Id} entered the elevator at floor {person.CurrentFloor}");
+            _insideElevator.Add(person);
         }
-        while (CurrentFloor != person.CurrentFloor)
+
+        DropOffPassengers();
+    }
+}
+
+
+    private void DropOffPassengers()
+    {
+        foreach (var person in _insideElevator.ToList())
         {
-            Thread.Sleep(_timeToChangeFloor);
-            CurrentFloor += MoveDirection;
-            Console.WriteLine($"Elevator moves to {CurrentFloor} floor");
+            MoveToFloor(person.DestinationFloor);
+            Console.WriteLine($"Person #{person.Id} delivered from floor {person.CurrentFloor} to floor {person.DestinationFloor}");
+            _insideElevator.Remove(person);
         }
     }
 
-    public void MoveToEndFloor()
+    private void MoveToFloor(int targetFloor)
     {
-        foreach (var person in _personsIntoElevator)
+        while (_currentFloor != targetFloor)
         {
-            if (person.EndFloor < CurrentFloor)
-            {
-                MoveDirection = -1;
-            }
-            else
-            {
-                MoveDirection = 1;
-            }
-            while (CurrentFloor != person.EndFloor)
-            {
-                Thread.Sleep(_timeToChangeFloor);
-                CurrentFloor += MoveDirection;
-                Console.WriteLine($"Elevator moves to {CurrentFloor} floor");
-            }
-            Console.WriteLine($"Elevator arrive person №{person.Id} to {CurrentFloor} floor");
-            Thread.Sleep(_timeToChangeFloor);
+            Thread.Sleep(TimeBetweenFloors);
+            _currentFloor += _currentFloor < targetFloor ? 1 : -1;
+            // Console.WriteLine($"Elevator moved to floor {_currentFloor}");
         }
-    }
-
-    public void MoveToFirstFloor()
-    {
-        MoveDirection = -1;
-        while (CurrentFloor != 1)
-        {
-            Thread.Sleep(_timeToChangeFloor);
-            CurrentFloor += MoveDirection;
-            Console.WriteLine($"Elevator moves to {CurrentFloor} floor");
-        }
-    }
-
-    public void AddToQueue(Person person)
-    {
-        if (person.CurrentFloor != 1)
-        {
-            _waitingToDownPersons.Add(person);
-        }
-        else
-        {
-            _waitingToUpPersons.Add(person);
-        }
-    }
-
-    public void BringPeople()
-    {
-        while (_waitingToDownPersons.Count + _waitingToUpPersons.Count != 0)
-        {
-            BringPersonToUp();
-            BringPersonToDown();
-        }
-        MoveToFirstFloor();
-    }
-
-    public void BringPersonToUp()
-    {
-        MoveToFirstFloor();
-        _waitingToUpPersons.Sort((person1, person2) => person1.EndFloor.CompareTo(person2.EndFloor));
-        int elevatorLimit = Math.Min(_waitingToUpPersons.Count, MaxCapacity);
-        for (int i = 0; i < elevatorLimit; i++)
-        {
-            _personsIntoElevator.Add(_waitingToUpPersons[i]);
-        }
-        _waitingToUpPersons.RemoveRange(0, elevatorLimit);
-        MoveToEndFloor();
-        _personsIntoElevator.Clear();
-    }
-
-    public void BringPersonToDown()
-    {
-        _waitingToDownPersons.Sort((person1, person2) => person1.CurrentFloor.CompareTo(person2.CurrentFloor));
-        int elevatorLimit = Math.Min(_waitingToDownPersons.Count, MaxCapacity);
-        for (int i = 0; i < elevatorLimit; i++)
-        {
-            MoveToFloor(_waitingToDownPersons[i]);
-            _personsIntoElevator.Add(_waitingToDownPersons[i]);
-        }
-        _waitingToDownPersons.RemoveRange(0, elevatorLimit);
-        MoveToEndFloor();
-        _personsIntoElevator.Clear();
     }
 }

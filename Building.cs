@@ -1,18 +1,25 @@
-class Building{
-    public List<Person> People = new List<Person>();
-    public Building(int countOfPersons)
+using System.Collections.Generic;
+
+class Building
+{
+    private readonly int _totalFloors;
+    private readonly List<Person> _people;
+
+    public Building(int totalFloors)
     {
-        for (int i = 0; i < countOfPersons; i++)
-        {
-            People.Add(new Person(i));
-        }
+        _totalFloors = totalFloors;
+        _people = new List<Person>();
     }
 
-    public void AllPersonCallElevator(Elevator elevator)
+    public void SpawnPerson(int id)
     {
-        foreach (var person in People)
-        {
-            person.CallElevator(elevator);
-        }
+        var person = new Person(id, _totalFloors);
+        _people.Add(person);
+        Console.WriteLine($"Spawned Person #{person.Id} at floor {person.CurrentFloor} wanting to go to floor {person.DestinationFloor}");
+    }
+
+    public Person GetLastSpawnedPerson()
+    {
+        return _people[^1];
     }
 }

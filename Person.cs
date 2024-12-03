@@ -1,23 +1,18 @@
-class Person{
-    public int CurrentFloor;
-    public int EndFloor = 1;
-    public int Id;
-    public int MaxFloor = 10;
+using System;
 
-    public Person(int id)
+class Person
+{
+    public int Id { get; }
+    public int CurrentFloor { get; }
+    public int DestinationFloor { get; }
+
+    public Person(int id, int totalFloors)
     {
         Id = id + 1;
         Random random = new Random();
-        CurrentFloor = random.NextDouble() < 0.5 ? 1 : random.Next(2, MaxFloor);
-        if (CurrentFloor == 1)
-        {
-            EndFloor = random.Next(2, MaxFloor);
-        }
-    }
-
-    public void CallElevator(Elevator elevator)
-    {
-        Console.WriteLine($"Person №{Id} at floor {CurrentFloor} calls the elevator to {EndFloor} floor.");
-        elevator.AddToQueue(this);
+        CurrentFloor = random.Next(0, 2) == 0 ? 1 : random.Next(2, totalFloors + 1);
+        DestinationFloor = CurrentFloor == 1
+            ? random.Next(2, totalFloors + 1) 
+            : random.Next(1, CurrentFloor); 
     }
 }
