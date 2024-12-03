@@ -5,19 +5,15 @@ class Program
 {
     static void Main(string[] args)
     {
-        Console.WriteLine("[System]    Simulation started.");
-
-        Building building = new Building(10);
+        Building building = new Building(9, 5);
         Simulation simulation = new Simulation(building);
 
         Thread elevatorThread = new Thread(building.Elevator.Operate);
         elevatorThread.Start();
+        Thread.Sleep(1000);
 
         simulation.Run(10);
-
         building.Elevator.Shutdown();
-
         elevatorThread.Join();
-        Console.WriteLine("[System]    Simulation ended.");
     }
 }
