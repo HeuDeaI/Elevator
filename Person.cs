@@ -10,7 +10,12 @@ class Person
     {
         Id = id + 1;
         Random random = new Random();
-        CurrentFloor = random.Next(0, 2) == 0 ? 1 : random.Next(2, totalFloors + 1);
-        DestinationFloor = CurrentFloor == 1 ? random.Next(2, totalFloors + 1) : 1;
+        CurrentFloor = random.Next(1, totalFloors + 1);
+        DestinationFloor = CurrentFloor;
+
+        while (DestinationFloor == CurrentFloor)
+        {
+            DestinationFloor = random.Next(1, totalFloors + 1);
+        }
     }
 }

@@ -10,10 +10,9 @@ class Program
 
         Thread elevatorThread = new Thread(building.Elevator.Operate);
         elevatorThread.Start();
-        Thread.Sleep(1000);
 
         simulation.Run(10);
-        building.Elevator.Shutdown();
+
         elevatorThread.Join();
     }
 }

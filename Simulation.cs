@@ -17,7 +17,7 @@ class Simulation
         for (int i = 0; i < numberOfPeople; i++)
         {
             _building.SpawnPerson(i);
-            Thread.Sleep(random.Next(500, 1500)); 
+            Thread.Sleep(random.Next(500, 1500));
         }
     }
 }

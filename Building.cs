@@ -11,13 +11,13 @@ class Building
     {
         _totalFloors = totalFloors;
         _people = new List<Person>();
-        Elevator = new Elevator(totalFloors, elevatorCapacity);
+        Elevator = new Elevator(totalFloors, elevatorCapacity, new ElevatorDisplay(totalFloors));
     }
 
     public void SpawnPerson(int id)
     {
         var person = new Person(id, _totalFloors);
         _people.Add(person);
-        Elevator.AddRequest(person); 
+        Elevator.AddRequest(person);
     }
 }
