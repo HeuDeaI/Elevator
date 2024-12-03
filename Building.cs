@@ -1,25 +1,24 @@
+using System;
 using System.Collections.Generic;
 
 class Building
 {
-    private readonly int _totalFloors;
+    public Elevator Elevator { get; }
+    private readonly int _totalFloors = 9;
     private readonly List<Person> _people;
 
     public Building(int totalFloors)
     {
-        _totalFloors = totalFloors;
         _people = new List<Person>();
+        Elevator = new Elevator(totalFloors);
     }
 
     public void SpawnPerson(int id)
     {
         var person = new Person(id, _totalFloors);
         _people.Add(person);
-        Console.WriteLine($"Spawned Person #{person.Id} at floor {person.CurrentFloor} wanting to go to floor {person.DestinationFloor}");
+        Elevator.AddRequest(person);
     }
 
-    public Person GetLastSpawnedPerson()
-    {
-        return _people[^1];
-    }
+    public Person GetLastSpawnedPerson() => _people[^1];
 }

@@ -11,8 +11,6 @@ class Person
         Id = id + 1;
         Random random = new Random();
         CurrentFloor = random.Next(0, 2) == 0 ? 1 : random.Next(2, totalFloors + 1);
-        DestinationFloor = CurrentFloor == 1
-            ? random.Next(2, totalFloors + 1) 
-            : random.Next(1, CurrentFloor); 
+        DestinationFloor = CurrentFloor == 1 ? random.Next(2, totalFloors + 1) : 1;
     }
 }
